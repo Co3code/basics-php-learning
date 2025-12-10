@@ -89,19 +89,25 @@
          <?php if (! empty($success)): ?>
             <div class="success"><?echo $success;?></div>
          <?php endif; ?>
-         <form action="" method="POST">
-            <div class="inform-group">
-               <label>Email:</label>
-               <input type="emaail" name="email" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
-
+        <form method="POST" action="">
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" name="email" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
             </div>
-            
+
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" name="password" required>
+            </div>
+
+            <button type="submit" class="submit-btn">Login</button>
+        </form>
+             <div class="register-link">
+            <p>Don't have an account? <a href="advance_forms.php">Register here</a></p>
+        </div>
 
 
 
-
-
-         </form>
 
       </div>
 
