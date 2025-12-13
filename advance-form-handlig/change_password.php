@@ -1,3 +1,72 @@
+
+<?php
+    session_start();
+
+    if (! isset($_SESSION['user_id'])) {
+        header("location: login.php");
+        exit();
+
+    }
+
+    require_once 'db_config.php';
+
+    $user_id = $_SESSION['user_id'];
+    $success = '';
+    $error   = '';
+
+    //process password change form
+
+    if ($_SERVER("REQUEST_METHOD") == "POST") {
+        $current_password = $_POST['current_password'];
+        $new_password     = $_POST['new_password'];
+        $confirm_password = $_POST['confirm_password'];
+
+        //validation
+        if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
+            $error = " new password fields are required.";
+        } elseif ($new_password !== $confirm_password) {
+            $error = "new password do not match.";
+        } elseif (strlen($new_password) < 8) {
+            $error = " new password must be at least 8 characters long";
+        } else {
+            //get the current hashed password form the database
+            $sql = "SELECT password FROM users WHERE id = ?";
+            $smt = $conn->prepare($sql);
+            $stmt->bind_param("i", $user_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $user = $result ->fetch_assoc();
+            $stmt ->close();
+
+            //verify current password 
+            if(password_verify($current_password, $user['password'])){
+                //hashed new password 
+                $hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
+                //update password in database 
+                $sql= "UPDATE users SET password = ? WHERE id = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("si", $hashed_new_password, $user_id);
+                if($stmt->execute()){
+                    $success = "password change successfulyy";
+                    //clear form 
+                    $_POST = [];
+
+                }else {
+                    $error = "password chaneg successfully" . $conn->error;
+                }
+                $stmt->close();
+
+            }else{
+                $error = "current password is incorrect";
+            }
+        }
+    }   
+
+?>
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
